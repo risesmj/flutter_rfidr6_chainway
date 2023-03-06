@@ -3,19 +3,19 @@ import 'package:rfidr6_chainway/app/entities/rfid_tag_entity.dart';
 import 'package:rfidr6_chainway/app/enums/connection_status.dart';
 
 class RFIDService {
-  late MethodChannel platform;
+  late MethodChannel _platform;
   List<RFIDTagEntity> results = [];
 
   //flags
   bool _isStartedRead = false;
-  bool isInitialized = false;
+  bool _isInitialized = false;
 
   RFIDService() {
-    platform = const MethodChannel('rfid6/channel');
+    _platform = const MethodChannel('rfid6/channel');
   }
 
   Future<bool> init({forceInit = false}) async {
-    if (isInitialized && !forceInit) return false;
+    if (_isInitialized && !forceInit) return false;
 
     bool obj = false;
 
@@ -28,13 +28,13 @@ class RFIDService {
       },
     );
 
-    isInitialized = obj;
+    _isInitialized = obj;
 
     return obj;
   }
 
   Future<RFIDTagEntity?> readOne() async {
-    if (!isInitialized) return null;
+    if (!_isInitialized) return null;
 
     RFIDTagEntity? obj;
 
@@ -51,7 +51,7 @@ class RFIDService {
   }
 
   Future<bool> startRead() async {
-    if (!isInitialized) return false;
+    if (!_isInitialized) return false;
     if (_isStartedRead) return false;
 
     bool obj = false;
@@ -71,7 +71,7 @@ class RFIDService {
   }
 
   Future<void> stopRead() async {
-    if (!isInitialized) return;
+    if (!_isInitialized) return;
 
     await _invokeNative(
       methodName: 'stopRead',
@@ -109,7 +109,7 @@ class RFIDService {
     void Function(dynamic)? onSuccess,
   }) async {
     try {
-      var result = await platform.invokeMethod(methodName);
+      var result = await _platform.invokeMethod(methodName);
 
       if (result != null) {
         onSuccess?.call(result);
